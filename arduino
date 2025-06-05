@@ -1,0 +1,65 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+#define BUZZER 13
+#define POTENCIOMETRO A0
+
+void acionarAlarme(int dados) {
+  if (dados < 700) {
+    noTone(BUZZER);
+  }
+  else if (dados >= 700 && dados < 900) {
+    tone(BUZZER, 300);
+    delay(2000);
+    noTone(BUZZER);
+    delay(2000);
+  }
+  else {
+    tone(BUZZER, 500);
+    delay(1000);
+    noTone(BUZZER);
+    delay(1000);
+  }
+}
+
+void tela(int dados) {
+  lcd.clear();
+
+  if (dados < 400) {
+    lcd.setCursor(0, 0);
+    lcd.print("Status: Bom");
+  }
+  else if (dados >= 400 && dados < 700) {
+    lcd.setCursor(0, 0);
+    lcd.print("Status: Mediano");
+    lcd.setCursor(0, 1);
+    lcd.print("Fique atento");
+  }
+  else if (dados >= 700 && dados < 900) {
+    lcd.setCursor(0, 0);
+    lcd.print("Status: Ruim");
+    lcd.setCursor(0, 1);
+    lcd.print("Saia do local");
+  }
+  else {
+    lcd.setCursor(0, 0);
+    lcd.print("Status: CRITICO");
+    lcd.setCursor(0, 1);
+    lcd.print("BUSQUE ABRIGO");
+  }
+}
+
+void setup() {
+  pinMode(BUZZER, OUTPUT);
+  lcd.init();
+  lcd.backlight(); 
+}
+
+void loop() {
+  int dados = analogRead(POTENCIOMETRO); 
+
+  acionarAlarme(dados);
+  tela(dados);
+  delay(1000);
+}
